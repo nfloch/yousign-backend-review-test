@@ -89,16 +89,16 @@ SQL;
         return $result;
     }
 
-    public function exist(int $id): bool
+    public function exist(int $ghaId): bool
     {
         $sql = <<<SQL
             SELECT 1
             FROM event
-            WHERE id = :id
+            WHERE gha_id = :ghaId
         SQL;
 
         $result = $this->connection->fetchOne($sql, [
-            'id' => $id
+            'ghaId' => $ghaId
         ]);
 
         return (bool) $result;
