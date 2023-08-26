@@ -10,7 +10,10 @@ use Webmozart\Assert\Assert;
 /**
  * @ORM\Entity()
  * @ORM\Table(name="`event`",
- *    indexes={@ORM\Index(name="IDX_EVENT_TYPE", columns={"type"})}
+ *      indexes={@ORM\Index(name="IDX_EVENT_TYPE", columns={"type"})},
+ *      uniqueConstraints={
+ *           @ORM\UniqueConstraint(name="event_gha_id", fields={"ghaId"})
+ *      }
  * )
  */
 class Event
@@ -18,9 +21,14 @@ class Event
     /**
      * @ORM\Id
      * @ORM\Column(type="bigint")
-     * @ORM\GeneratedValue(strategy="NONE")
+     * @ORM\GeneratedValue
      */
-    private int $id;
+    private ?int $id;
+
+    /**
+     * @ORM\Column(type="bigint")
+     */
+    public int $ghaId;
 
     /**
      * @ORM\Column(type="EventType", nullable=false)
@@ -59,9 +67,10 @@ class Event
      */
     private ?string $comment;
 
-    public function __construct(int $id, string $type, Actor $actor, Repo $repo, array $payload, \DateTimeImmutable $createAt, ?string $comment)
+    public function __construct(?int $id, int $ghaId, string $type, Actor $actor, Repo $repo, array $payload, \DateTimeImmutable $createAt, ?string $comment)
     {
         $this->id = $id;
+        $this->ghaId = $ghaId;
         EventType::assertValidChoice($type);
         $this->type = $type;
         $this->actor = $actor;

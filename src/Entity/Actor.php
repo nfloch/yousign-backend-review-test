@@ -7,16 +7,26 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity()
- * @ORM\Table(name="actor")
+ * @ORM\Table(
+ *      name="actor",
+ *      uniqueConstraints={
+ *          @ORM\UniqueConstraint(name="actor_gha_id", fields={"ghaId"})
+ *      }
+ * )
  */
 class Actor
 {
     /**
      * @ORM\Id
      * @ORM\Column(type="bigint")
-     * @ORM\GeneratedValue(strategy="NONE")
+     * @ORM\GeneratedValue
      */
-    public int $id;
+    public ?int $id;
+
+    /**
+     * @ORM\Column(type="bigint")
+     */
+    public int $ghaId;
 
     /**
      * @ORM\Column(type="string")
@@ -33,9 +43,10 @@ class Actor
      */
     public string $avatarUrl;
 
-    public function __construct(int $id, string $login, string $url, string $avatarUrl)
+    public function __construct(?int $id, int $ghaId, string $login, string $url, string $avatarUrl)
     {
         $this->id = $id;
+        $this->ghaId = $ghaId;
         $this->login = $login;
         $this->url = $url;
         $this->avatarUrl = $avatarUrl;
