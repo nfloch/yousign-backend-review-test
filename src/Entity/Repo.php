@@ -8,16 +8,26 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="repo")
+ * @ORM\Table(
+ *      name="repo",
+ *      uniqueConstraints={
+ *            @ORM\UniqueConstraint(name="repo_gha_id", fields={"ghaId"})
+ *      }
+ * )
  */
 class Repo
 {
     /**
      * @ORM\Id
      * @ORM\Column(type="bigint")
-     * @ORM\GeneratedValue(strategy="NONE")
+     * @ORM\GeneratedValue
      */
-    private int $id;
+    private ?int $id;
+
+    /**
+     * @ORM\Column(type="bigint")
+     */
+    public int $ghaId;
 
     /**
      * @ORM\Column(type="string")
@@ -29,9 +39,10 @@ class Repo
      */
     public string $url;
 
-    public function __construct(int $id, string $name, string $url)
+    public function __construct(?int $id, int $ghaId, string $name, string $url)
     {
         $this->id = $id;
+        $this->ghaId = $ghaId;
         $this->name = $name;
         $this->url = $url;
     }

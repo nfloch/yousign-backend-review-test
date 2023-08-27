@@ -29,9 +29,9 @@ class EventController
     }
 
     /**
-     * @Route(path="/api/event/{id}/update", name="api_commit_update", methods={"PUT"})
+     * @Route(path="/api/event/{ghaId}/update", name="api_commit_update", methods={"PUT"})
      */
-    public function update(Request $request, int $id, ValidatorInterface $validator): Response
+    public function update(Request $request, int $ghaId, ValidatorInterface $validator): Response
     {
         $eventInput = $this->serializer->deserialize($request->getContent(), EventInput::class, 'json');
 
@@ -44,15 +44,15 @@ class EventController
             );
         }
 
-        if($this->readEventRepository->exist($id) === false) {
+        if($this->readEventRepository->exist($ghaId) === false) {
             return new JsonResponse(
-                ['message' => sprintf('Event identified by %d not found !', $id)],
+                ['message' => sprintf('Event identified by %d not found !', $ghaId)],
                 Response::HTTP_NOT_FOUND
             );
         }
 
         try {
-            $this->writeEventRepository->update($eventInput, $id);
+            $this->writeEventRepository->update($eventInput, $ghaId);
         } catch (\Exception $exception) {
             return new Response(null, Response::HTTP_SERVICE_UNAVAILABLE);
         }
