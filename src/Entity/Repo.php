@@ -22,7 +22,7 @@ class Repo
      * @ORM\Column(type="bigint")
      * @ORM\GeneratedValue
      */
-    private ?int $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="bigint")
@@ -39,9 +39,8 @@ class Repo
      */
     public string $url;
 
-    public function __construct(?int $id, int $ghaId, string $name, string $url)
+    public function __construct(int $ghaId, string $name, string $url)
     {
-        $this->id = $id;
         $this->ghaId = $ghaId;
         $this->name = $name;
         $this->url = $url;
@@ -60,14 +59,5 @@ class Repo
     public function url(): string
     {
         return $this->url;
-    }
-
-    public static function fromArray(array $data): self
-    {
-        return new self(
-            (int) $data['id'],
-            $data['name'],
-            $data['url']
-        );
     }
 }

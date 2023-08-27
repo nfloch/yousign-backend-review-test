@@ -22,7 +22,7 @@ class Event
      * @ORM\Column(type="bigint")
      * @ORM\GeneratedValue
      */
-    private ?int $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="bigint")
@@ -53,6 +53,7 @@ class Event
 
     /**
      * @ORM\Column(type="json", nullable=false, options={"jsonb": true})
+     * @var array<string, mixed>
      */
     private array $payload;
 
@@ -66,9 +67,11 @@ class Event
      */
     private ?string $comment;
 
-    public function __construct(?int $id, int $ghaId, string $type, Actor $actor, Repo $repo, array $payload, \DateTimeImmutable $createAt, ?string $comment)
+    /**
+     * @param array<string, mixed> $payload
+     */
+    public function __construct(int $ghaId, string $type, Actor $actor, Repo $repo, array $payload, \DateTimeImmutable $createAt, ?string $comment)
     {
-        $this->id = $id;
         $this->ghaId = $ghaId;
         EventType::assertValidChoice($type);
         $this->type = $type;
@@ -103,6 +106,9 @@ class Event
         return $this->repo;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function payload(): array
     {
         return $this->payload;

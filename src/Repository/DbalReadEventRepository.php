@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Dto\SearchInput;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 
 class DbalReadEventRepository implements ReadEventRepository
 {
@@ -28,6 +29,10 @@ SQL;
         ]);
     }
 
+    /**
+     * @return array<string, int>
+     * @throws Exception
+     */
     public function countByType(SearchInput $searchInput): array
     {
         $sql = <<<'SQL'
@@ -43,6 +48,9 @@ SQL;
         ]);
     }
 
+    /**
+     * @return array<array<string, int>>
+     */
     public function statsByTypePerHour(SearchInput $searchInput): array
     {
         $sql = <<<SQL
@@ -66,6 +74,10 @@ SQL;
         return $data;
     }
 
+    /**
+     * @return array<array<string, mixed>>
+     * @throws Exception
+     */
     public function getLatest(SearchInput $searchInput): array
     {
         $sql = <<<SQL

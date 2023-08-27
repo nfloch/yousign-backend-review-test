@@ -20,8 +20,14 @@ class FileUncompressor
             $out_file = fopen($outputPath, 'wb');
             $file = gzopen($compressedFiledPath, 'rb');
 
+            if ($out_file === false || $file === false) {
+                throw new \RuntimeException('An error occurred when opening stream for compressed file or destination file');
+            }
+
             while (!gzeof($file)) {
-                fwrite($out_file, gzread($file, $this->bufferSize));
+                if (($readBuffer = gzread($file, $this->bufferSize)) !== false) {
+                    fwrite($out_file, $readBuffer);
+                }
             }
 
             fclose($out_file);

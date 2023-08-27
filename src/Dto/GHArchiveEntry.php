@@ -4,6 +4,9 @@ namespace App\Dto;
 
 class GHArchiveEntry
 {
+    /**
+     * @param array<string, mixed> $payload
+     */
     public function __construct(
         public readonly int $id,
         public readonly string $type,

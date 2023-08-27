@@ -15,21 +15,18 @@ class EventFixtures extends Fixture
     public const ACTOR_1_ID = 1;
     public const REPO_1_ID = 1;
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $event = new Event(
             self::EVENT_1_ID,
-            self::EVENT_1_ID,
             EventType::COMMENT,
             new Actor(
-                self::ACTOR_1_ID,
                 self::ACTOR_1_ID,
                 'jdoe',
                 'https://api.github.com/users/jdoe',
                 'https://avatars.githubusercontent.com/u/1?'
             ),
             new Repo(
-                self::REPO_1_ID,
                 self::REPO_1_ID,
                 'yousign/test',
                 'https://api.github.com/repos/yousign/backend-test'

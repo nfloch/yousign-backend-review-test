@@ -58,8 +58,8 @@ class ImportGitHubEventsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $date = $input->getArgument('date');
-        $hour = $input->getArgument('hour');
+        $date = (string) $input->getArgument('date');
+        $hour = (string) $input->getArgument('hour');
 
         $this->io = new SymfonyStyle($input, $output);
 
@@ -117,7 +117,6 @@ class ImportGitHubEventsCommand extends Command
         $repo = $this->fetchOrCreateRepo($ghArchiveEvent);
 
         $event = new Event(
-            null,
             $ghArchiveEvent->id,
             $this->eventTypeMapper->transformEventType($ghArchiveEvent->type),
             $actor,
@@ -136,7 +135,6 @@ class ImportGitHubEventsCommand extends Command
         $actor = $this->actorReadRepository->findOneBy(['ghaId' => $ghArchiveEvent->actorId]);
         if (!$actor instanceof Actor) {
             $actor = new Actor(
-                null,
                 $ghArchiveEvent->actorId,
                 $ghArchiveEvent->actorLogin,
                 $ghArchiveEvent->actorUrl,
@@ -153,7 +151,6 @@ class ImportGitHubEventsCommand extends Command
         $repo = $this->repoReadRepository->findOneBy(['ghaId' => $ghArchiveEvent->repoId]);
         if (!$repo instanceof Repo) {
             $repo = new Repo(
-                null,
                 $ghArchiveEvent->repoId,
                 $ghArchiveEvent->repoName,
                 $ghArchiveEvent->repoUrl

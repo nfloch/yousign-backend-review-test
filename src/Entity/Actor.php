@@ -22,7 +22,7 @@ class Actor
      * @ORM\Column(type="bigint")
      * @ORM\GeneratedValue
      */
-    public ?int $id;
+    public int $id;
 
     /**
      * @ORM\Column(type="bigint")
@@ -44,9 +44,8 @@ class Actor
      */
     public string $avatarUrl;
 
-    public function __construct(?int $id, int $ghaId, string $login, string $url, string $avatarUrl)
+    public function __construct(int $ghaId, string $login, string $url, string $avatarUrl)
     {
-        $this->id = $id;
         $this->ghaId = $ghaId;
         $this->login = $login;
         $this->url = $url;
@@ -71,15 +70,5 @@ class Actor
     public function avatarUrl(): string
     {
         return $this->avatarUrl;
-    }
-
-    public static function fromArray(array $data): self
-    {
-        return new self(
-            (int) $data['id'],
-            $data['login'],
-            $data['url'],
-            $data['avatar_url']
-        );
     }
 }

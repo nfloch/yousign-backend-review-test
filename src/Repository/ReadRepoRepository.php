@@ -6,6 +6,9 @@ use App\Entity\Repo;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Repo>
+ */
 class ReadRepoRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -21,6 +24,6 @@ class ReadRepoRepository extends ServiceEntityRepository
             ->setParameter('ghaId', $ghaId)
             ->getQuery();
 
-        return 1 === $query->getScalarResult();
+        return 1 === (int) $query->getScalarResult();
     }
 }
