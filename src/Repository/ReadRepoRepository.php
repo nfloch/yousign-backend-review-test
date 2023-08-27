@@ -8,7 +8,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class ReadRepoRepository extends ServiceEntityRepository
 {
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Repo::class);
@@ -22,6 +21,6 @@ class ReadRepoRepository extends ServiceEntityRepository
             ->setParameter('ghaId', $ghaId)
             ->getQuery();
 
-        return $query->getScalarResult() === 1;
+        return 1 === $query->getScalarResult();
     }
 }
