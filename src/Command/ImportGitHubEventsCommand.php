@@ -14,7 +14,6 @@ use App\Repository\ReadRepoRepository;
 use App\Service\DataFetcher\GhArchiveDataFetcher;
 use App\Service\FileReader;
 use App\Service\GHArchiveEventTypeMapper;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -29,23 +28,21 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ImportGitHubEventsCommand extends Command
 {
+    private const BATCH_SIZE = 500;
     protected static $defaultName = 'app:import-github-events';
 
     private SymfonyStyle $io;
 
-    private const BATCH_SIZE = 500;
-
     public function __construct(
-        private readonly FileReader               $fileReader,
-        private readonly SerializerInterface      $serializer,
-        private readonly ReadEventRepository      $readEventRepository,
-        private readonly ReadActorRepository      $actorReadRepository,
-        private readonly ReadRepoRepository       $repoReadRepository,
-        private readonly EntityManagerInterface   $entityManager,
+        private readonly FileReader $fileReader,
+        private readonly SerializerInterface $serializer,
+        private readonly ReadEventRepository $readEventRepository,
+        private readonly ReadActorRepository $actorReadRepository,
+        private readonly ReadRepoRepository $repoReadRepository,
+        private readonly EntityManagerInterface $entityManager,
         private readonly GHArchiveEventTypeMapper $eventTypeMapper,
         private readonly GhArchiveDataFetcher $dataFetcher,
-    )
-    {
+    ) {
         parent::__construct();
     }
 
@@ -53,24 +50,25 @@ class ImportGitHubEventsCommand extends Command
     {
         $this
             ->setDescription('Import GH events. Memory leaks could happen because of doctrine even when calling clear() method. Please call with --no-debug. See https://github.com/doctrine/orm/issues/8891#issuecomment-1114855002')
-            ->addArgument("date", InputArgument::REQUIRED, "The date (format YYYY-MM-DD) to fetch data from")
-            ->addArgument("hour", InputArgument::REQUIRED, "The hour (1-25) to fetch data from")
+            ->addArgument('date', InputArgument::REQUIRED, 'The date (format YYYY-MM-DD) to fetch data from')
+            ->addArgument('hour', InputArgument::REQUIRED, 'The hour (1-25) to fetch data from')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $date = $input->getArgument("date");
-        $hour = $input->getArgument("hour");
+        $date = (string) $input->getArgument('date');
+        $hour = (string) $input->getArgument('hour');
 
         $this->io = new SymfonyStyle($input, $output);
 
         if (!$this->areArgumentsValid($date, $hour)) {
             $this->io->error('Bad formatted arguments.');
+
             return Command::INVALID;
         }
 
-        $this->io->title("Import GitHub events for date $date and hour $hour");
+        $this->io->title("Import GitHub events for date {$date} and hour {$hour}");
         $dataFilePath = $this->dataFetcher->fetchData($date, $hour);
         $this->io->info('File downloaded and uncompressed');
 
@@ -85,17 +83,17 @@ class ImportGitHubEventsCommand extends Command
 
     private function areArgumentsValid(string $date, string $hour): bool
     {
-        return DateTimeImmutable::createFromFormat('Y-m-d', $date) !== false &&
-            (is_numeric($hour) && intval($hour) >= 1 && intval($hour) <= 23);
+        return false !== \DateTimeImmutable::createFromFormat('Y-m-d', $date)
+            && (is_numeric($hour) && intval($hour) >= 1 && intval($hour) <= 23);
     }
 
     private function processBatch(string $uncompressedFilePath): void
     {
         $i = 0;
         foreach ($this->io->progressIterate($this->fileReader->getIterator($uncompressedFilePath)) as $line) {
-            /** @var string $line */
+            // @var string $line
             $this->handleEvent($line);
-            if (++$i === self::BATCH_SIZE) {
+            if (self::BATCH_SIZE === ++$i) {
                 $this->entityManager->clear();
                 $i = 0;
             }
@@ -108,8 +106,8 @@ class ImportGitHubEventsCommand extends Command
         $ghArchiveEvent = $this->serializer->deserialize($event, GHArchiveEntry::class, 'json');
 
         if (
-            !$this->eventTypeMapper->isEventTypeAllowed($ghArchiveEvent->type) ||
-            $this->readEventRepository->exist($ghArchiveEvent->id)
+            !$this->eventTypeMapper->isEventTypeAllowed($ghArchiveEvent->type)
+            || $this->readEventRepository->exist($ghArchiveEvent->id)
         ) {
             return;
         }
@@ -118,7 +116,6 @@ class ImportGitHubEventsCommand extends Command
         $repo = $this->fetchOrCreateRepo($ghArchiveEvent);
 
         $event = new Event(
-            null,
             $ghArchiveEvent->id,
             $this->eventTypeMapper->transformEventType($ghArchiveEvent->type),
             $actor,
@@ -137,7 +134,6 @@ class ImportGitHubEventsCommand extends Command
         $actor = $this->actorReadRepository->findOneBy(['ghaId' => $ghArchiveEvent->actorId]);
         if (!$actor instanceof Actor) {
             $actor = new Actor(
-                null,
                 $ghArchiveEvent->actorId,
                 $ghArchiveEvent->actorLogin,
                 $ghArchiveEvent->actorUrl,
@@ -154,7 +150,6 @@ class ImportGitHubEventsCommand extends Command
         $repo = $this->repoReadRepository->findOneBy(['ghaId' => $ghArchiveEvent->repoId]);
         if (!$repo instanceof Repo) {
             $repo = new Repo(
-                null,
                 $ghArchiveEvent->repoId,
                 $ghArchiveEvent->repoName,
                 $ghArchiveEvent->repoUrl

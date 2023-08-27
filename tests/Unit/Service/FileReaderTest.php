@@ -5,9 +5,13 @@ namespace App\Tests\Unit\Service;
 use App\Service\FileReader;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class FileReaderTest extends TestCase
 {
-
     private FileReader $testedInstance;
 
     protected function setUp(): void
@@ -17,7 +21,7 @@ class FileReaderTest extends TestCase
 
     public function testGetIterator(): void
     {
-        $filePath = __DIR__ . "/../../data/test.txt";
+        $filePath = __DIR__.'/../../data/test.txt';
         $lines = [...$this->testedInstance->getIterator($filePath)];
         $this->assertEquals("azerty\n", $lines[0]);
         $this->assertEquals("123456\n", $lines[1]);

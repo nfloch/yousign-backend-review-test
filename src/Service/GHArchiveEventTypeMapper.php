@@ -3,18 +3,17 @@
 namespace App\Service;
 
 use App\Entity\EventType;
-use RuntimeException;
 
 class GHArchiveEventTypeMapper
 {
     public function isEventTypeAllowed(string $type): bool
     {
         $allowedTypes = [
-            "CommitCommentEvent",
-            "IssueCommentEvent",
-            "PullRequestReviewCommentEvent",
-            "PushEvent",
-            "PullRequestEvent"
+            'CommitCommentEvent',
+            'IssueCommentEvent',
+            'PullRequestReviewCommentEvent',
+            'PushEvent',
+            'PullRequestEvent',
         ];
 
         return in_array($type, $allowedTypes);
@@ -22,15 +21,16 @@ class GHArchiveEventTypeMapper
 
     /**
      * @return string The corresponding event type for entity
-     * @throws RuntimeException
+     *
+     * @throws \RuntimeException
      */
-    public function transformEventType(string $ghArchiveType): string {
-
+    public function transformEventType(string $ghArchiveType): string
+    {
         return match ($ghArchiveType) {
-            "CommitCommentEvent", "IssueCommentEvent", "PullRequestReviewCommentEvent" => EventType::COMMENT,
-            "PullRequestEvent" => EventType::PULL_REQUEST,
-            "PushEvent" => EventType::COMMIT,
-            default => throw new RuntimeException('Unknown ghArchive type')
+            'CommitCommentEvent', 'IssueCommentEvent', 'PullRequestReviewCommentEvent' => EventType::COMMENT,
+            'PullRequestEvent' => EventType::PULL_REQUEST,
+            'PushEvent' => EventType::COMMIT,
+            default => throw new \RuntimeException('Unknown ghArchive type')
         };
     }
 }

@@ -4,8 +4,12 @@ namespace App\Tests\Unit\Service;
 
 use App\Service\FileUncompressor;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class FileUncompressorTest extends TestCase
 {
     private FileUncompressor $testedInstance;
@@ -17,9 +21,9 @@ class FileUncompressorTest extends TestCase
 
     public function testUncompressFile(): void
     {
-        $filePath = __DIR__ . "/../../data/test.txt.gz";
-        $originalFilePath = __DIR__ . "/../../data/test.txt";
-        $outputPath = sys_get_temp_dir() . "/result";
+        $filePath = __DIR__.'/../../data/test.txt.gz';
+        $originalFilePath = __DIR__.'/../../data/test.txt';
+        $outputPath = sys_get_temp_dir().'/result';
 
         $this->testedInstance->uncompressFile($filePath, $outputPath);
 
@@ -28,10 +32,10 @@ class FileUncompressorTest extends TestCase
 
     public function testItThrowExceptionWhenFileIsNotFound(): void
     {
-        $filePath = __DIR__ . "/../../data/unknownFile.txt.gz";
-        $outputPath = sys_get_temp_dir() . "/result";
+        $filePath = __DIR__.'/../../data/unknownFile.txt.gz';
+        $outputPath = sys_get_temp_dir().'/result';
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $this->testedInstance->uncompressFile($filePath, $outputPath);
     }
 }

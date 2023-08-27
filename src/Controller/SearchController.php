@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Dto\SearchInput;
 use App\Repository\ReadEventRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -12,15 +11,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class SearchController
 {
-    private ReadEventRepository $repository;
-    private SerializerInterface $serializer;
-
-    public function __construct(
-        ReadEventRepository $repository,
-        SerializerInterface  $serializer
-    ) {
-        $this->repository = $repository;
-        $this->serializer = $serializer;
+    public function __construct(private readonly ReadEventRepository $repository, private readonly SerializerInterface $serializer)
+    {
     }
 
     /**
@@ -41,8 +33,8 @@ class SearchController
             ],
             'data' => [
                 'events' => $this->repository->getLatest($searchInput),
-                'stats' => $this->repository->statsByTypePerHour($searchInput)
-            ]
+                'stats' => $this->repository->statsByTypePerHour($searchInput),
+            ],
         ];
 
         return new JsonResponse($data);

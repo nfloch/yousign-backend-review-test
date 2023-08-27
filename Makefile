@@ -105,7 +105,37 @@ unit-test: vendor ## Run PhpUnit unit testsuite
 	@$(call log_success,Done)
 
 .PHONY: func-test
-func-test: var/docker.up ## Run PhpUnit functionnal testsuite
+func-test: var/docker.up db-test ## Run PhpUnit functionnal testsuite
 	@$(call log,Running ...)
 	$(PHP_EXEC) bin/phpunit -v --testsuite func --testdox
+	@$(call log_success,Done)
+
+.PHONY: rector
+rector: var/docker.up
+	@$(call log,Running ...)
+	$(PHP_EXEC) vendor/bin/rector process --dry-run
+	@$(call log_success,Done)
+
+.PHONY: rector-fix
+rector-fix: var/docker.up
+	@$(call log,Running ...)
+	$(PHP_EXEC) vendor/bin/rector process
+	@$(call log_success,Done)
+
+.PHONY: cs
+cs: var/docker.up
+	@$(call log,Running ...)
+	$(PHP_EXEC) php vendor/bin/php-cs-fixer fix --dry-run --diff
+	@$(call log_success,Done)
+
+.PHONY: cs-fix
+cs-fix: var/docker.up
+	@$(call log,Running ...)
+	$(PHP_EXEC) php vendor/bin/php-cs-fixer fix
+	@$(call log_success,Done)
+
+.PHONY: phpstan
+phpstan: var/docker.up
+	@$(call log,Running ...)
+	$(PHP_EXEC) php vendor/bin/phpstan analyse
 	@$(call log_success,Done)

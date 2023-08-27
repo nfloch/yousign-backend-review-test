@@ -3,16 +3,20 @@
 namespace App\Tests\Func;
 
 use App\DataFixtures\EventFixtures;
-use App\Entity\Event;
 use Doctrine\ORM\Tools\SchemaTool;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class EventControllerTest extends WebTestCase
 {
     protected AbstractDatabaseTool $databaseTool;
-    private static $client;
+    private static \Symfony\Bundle\FrameworkBundle\KernelBrowser $client;
 
     protected function setUp(): void
     {
@@ -46,14 +50,13 @@ class EventControllerTest extends WebTestCase
         $this->assertResponseStatusCodeSame(204);
     }
 
-
     public function testUpdateShouldReturnHttpNotFoundResponse()
     {
         $client = static::$client;
 
         $client->request(
             'PUT',
-            sprintf('/api/event/%d/update', 7897897897),
+            sprintf('/api/event/%d/update', 7_897_897_897),
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
@@ -62,7 +65,7 @@ class EventControllerTest extends WebTestCase
 
         $this->assertResponseStatusCodeSame(404);
 
-        $expectedJson = <<<JSON
+        $expectedJson = <<<'JSON'
               {
                 "message":"Event identified by 7897897897 not found !"
               }
@@ -89,19 +92,18 @@ class EventControllerTest extends WebTestCase
 
         self::assertResponseStatusCodeSame(400);
         self::assertJsonStringEqualsJsonString($expectedResponse, $client->getResponse()->getContent());
-
     }
 
     public function providePayloadViolations(): iterable
     {
         yield 'comment too short' => [
-            <<<JSON
+            <<<'JSON'
               {
                 "comment": "short"
                 
             }
             JSON,
-            <<<JSON
+            <<<'JSON'
                 {
                     "message": "This value is too short. It should have 20 characters or more."
                 }

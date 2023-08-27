@@ -16,17 +16,16 @@ class OnlineGhArchiveFetcher implements GhArchiveDataFetcher
         private readonly TemporaryFileWriter $fileWriter,
         private readonly FileUncompressor $fileUncompressor,
         private readonly Filesystem $filesystem,
-    )
-    {
+    ) {
     }
 
     public function fetchData(string $date, string $hour): string
     {
         $dataFileName = $this->filenameBuilder->buildFilename($date, $hour);
-        $content = $this->archiveDownloader->downloadCompressed($dataFileName . ".gz");
-        $tempFilePath = $this->fileWriter->writeContentToTempFile($content, "gharchive_", ".json.gz");
+        $content = $this->archiveDownloader->downloadCompressed($dataFileName.'.gz');
+        $tempFilePath = $this->fileWriter->writeContentToTempFile($content, 'gharchive_', '.json.gz');
 
-        $dataFilePath = self::DATA_DIR . $dataFileName;
+        $dataFilePath = self::DATA_DIR.$dataFileName;
         $this->fileUncompressor->uncompressFile($tempFilePath, $dataFilePath);
 
         $this->filesystem->remove($tempFilePath);

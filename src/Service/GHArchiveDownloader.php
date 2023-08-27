@@ -2,10 +2,8 @@
 
 namespace App\Service;
 
-use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Throwable;
 
 class GHArchiveDownloader
 {
@@ -17,23 +15,22 @@ class GHArchiveDownloader
 
     /**
      * @param string $fileName Compressed file to download
+     *
      * @return string The content of the compressed file as a string
-     * @throws RuntimeException
+     *
+     * @throws \RuntimeException
      */
     public function downloadCompressed(string $fileName): string
     {
         try {
-            $response = $this->httpClient->request('GET', self::BASE_URL . $fileName);
+            $response = $this->httpClient->request('GET', self::BASE_URL.$fileName);
             if (($statusCode = $response->getStatusCode()) !== Response::HTTP_OK) {
-                throw new RuntimeException('Bad response code from gharchive', $statusCode);
+                throw new \RuntimeException('Bad response code from gharchive', $statusCode);
             }
 
             return $response->getContent();
-        } catch (Throwable $throwable) {
-            throw new RuntimeException(
-                'Error when fetching gharchive compressed data',
-                previous: $throwable
-            );
+        } catch (\Throwable $throwable) {
+            throw new \RuntimeException('Error when fetching gharchive compressed data', previous: $throwable);
         }
     }
 }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Webmozart\Assert\Assert;
 
 /**
  * @ORM\Entity()
@@ -23,12 +22,7 @@ class Event
      * @ORM\Column(type="bigint")
      * @ORM\GeneratedValue
      */
-    private ?int $id;
-
-    /**
-     * @ORM\Column(type="bigint")
-     */
-    public int $ghaId;
+    private int $id;
 
     /**
      * @ORM\Column(type="EventType", nullable=false)
@@ -41,45 +35,46 @@ class Event
     private int $count = 1;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Actor", cascade={"persist"})
-     * @ORM\JoinColumn(name="actor_id", referencedColumnName="id")
+     * @param array<string, mixed> $payload
      */
-    private Actor $actor;
+    public function __construct(
+        /**
+         * @ORM\Column(type="bigint")
+         */
+        public int $ghaId,
+        string $type,
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Repo", cascade={"persist"})
-     * @ORM\JoinColumn(name="repo_id", referencedColumnName="id")
-     */
-    private Repo $repo;
+        /**
+         * @ORM\ManyToOne(targetEntity="App\Entity\Actor", cascade={"persist"})
+         * @ORM\JoinColumn(name="actor_id", referencedColumnName="id")
+         */
+        private Actor $actor,
 
-    /**
-     * @ORM\Column(type="json", nullable=false, options={"jsonb": true})
-     */
-    private array $payload;
+        /**
+         * @ORM\ManyToOne(targetEntity="App\Entity\Repo", cascade={"persist"})
+         * @ORM\JoinColumn(name="repo_id", referencedColumnName="id")
+         */
+        private Repo $repo,
 
-    /**
-     * @ORM\Column(type="datetime_immutable", nullable=false)
-     */
-    private \DateTimeImmutable $createAt;
+        /**
+         * @ORM\Column(type="json", nullable=false, options={"jsonb"=true})
+         */
+        private array $payload,
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private ?string $comment;
+        /**
+         * @ORM\Column(type="datetime_immutable", nullable=false)
+         */
+        private \DateTimeImmutable $createAt,
 
-    public function __construct(?int $id, int $ghaId, string $type, Actor $actor, Repo $repo, array $payload, \DateTimeImmutable $createAt, ?string $comment)
-    {
-        $this->id = $id;
-        $this->ghaId = $ghaId;
+        /**
+         * @ORM\Column(type="text", nullable=true)
+         */
+        private ?string $comment,
+    ) {
         EventType::assertValidChoice($type);
         $this->type = $type;
-        $this->actor = $actor;
-        $this->repo = $repo;
-        $this->payload = $payload;
-        $this->createAt = $createAt;
-        $this->comment = $comment;
 
-        if ($type === EventType::COMMIT) {
+        if (EventType::COMMIT === $type) {
             $this->count = $payload['size'] ?? 1;
         }
     }
@@ -104,6 +99,9 @@ class Event
         return $this->repo;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function payload(): array
     {
         return $this->payload;

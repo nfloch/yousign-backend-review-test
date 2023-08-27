@@ -2,10 +2,11 @@
 
 namespace App\Dto;
 
-use DateTimeImmutable;
-
 class GHArchiveEntry
 {
+    /**
+     * @param array<string, mixed> $payload
+     */
     public function __construct(
         public readonly int $id,
         public readonly string $type,
@@ -19,8 +20,7 @@ class GHArchiveEntry
         public readonly string $repoUrl,
         public readonly array $payload,
         public readonly bool $public,
-        public readonly DateTimeImmutable $createdAt
-    )
-    {
+        public readonly \DateTimeImmutable $createdAt
+    ) {
     }
 }
