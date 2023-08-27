@@ -11,9 +11,9 @@ use Doctrine\Persistence\ObjectManager;
 
 class EventFixtures extends Fixture
 {
-    public const EVENT_1_ID = 1;
-    public const ACTOR_1_ID = 1;
-    public const REPO_1_ID = 1;
+    final public const EVENT_1_ID = 1;
+    final public const ACTOR_1_ID = 1;
+    final public const REPO_1_ID = 1;
 
     public function load(ObjectManager $manager): void
     {

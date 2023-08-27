@@ -5,6 +5,11 @@ namespace App\Tests\Unit\Service;
 use App\Service\FileUncompressor;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class FileUncompressorTest extends TestCase
 {
     private FileUncompressor $testedInstance;

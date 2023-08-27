@@ -28,7 +28,8 @@ class ReadActorRepository extends ServiceEntityRepository
             ->select('COUNT(a.id)')
             ->where('a.ghaId = :ghaId')
             ->setParameter('ghaId', $ghaId)
-            ->getQuery();
+            ->getQuery()
+        ;
 
         return 1 === $query->getSingleScalarResult();
     }

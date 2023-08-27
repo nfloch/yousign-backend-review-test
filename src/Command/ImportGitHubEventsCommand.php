@@ -28,11 +28,10 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ImportGitHubEventsCommand extends Command
 {
+    private const BATCH_SIZE = 500;
     protected static $defaultName = 'app:import-github-events';
 
     private SymfonyStyle $io;
-
-    private const BATCH_SIZE = 500;
 
     public function __construct(
         private readonly FileReader $fileReader,
@@ -69,7 +68,7 @@ class ImportGitHubEventsCommand extends Command
             return Command::INVALID;
         }
 
-        $this->io->title("Import GitHub events for date $date and hour $hour");
+        $this->io->title("Import GitHub events for date {$date} and hour {$hour}");
         $dataFilePath = $this->dataFetcher->fetchData($date, $hour);
         $this->io->info('File downloaded and uncompressed');
 
@@ -84,15 +83,15 @@ class ImportGitHubEventsCommand extends Command
 
     private function areArgumentsValid(string $date, string $hour): bool
     {
-        return false !== \DateTimeImmutable::createFromFormat('Y-m-d', $date) &&
-            (is_numeric($hour) && intval($hour) >= 1 && intval($hour) <= 23);
+        return false !== \DateTimeImmutable::createFromFormat('Y-m-d', $date)
+            && (is_numeric($hour) && intval($hour) >= 1 && intval($hour) <= 23);
     }
 
     private function processBatch(string $uncompressedFilePath): void
     {
         $i = 0;
         foreach ($this->io->progressIterate($this->fileReader->getIterator($uncompressedFilePath)) as $line) {
-            /* @var string $line */
+            // @var string $line
             $this->handleEvent($line);
             if (self::BATCH_SIZE === ++$i) {
                 $this->entityManager->clear();
@@ -107,8 +106,8 @@ class ImportGitHubEventsCommand extends Command
         $ghArchiveEvent = $this->serializer->deserialize($event, GHArchiveEntry::class, 'json');
 
         if (
-            !$this->eventTypeMapper->isEventTypeAllowed($ghArchiveEvent->type) ||
-            $this->readEventRepository->exist($ghArchiveEvent->id)
+            !$this->eventTypeMapper->isEventTypeAllowed($ghArchiveEvent->type)
+            || $this->readEventRepository->exist($ghArchiveEvent->id)
         ) {
             return;
         }

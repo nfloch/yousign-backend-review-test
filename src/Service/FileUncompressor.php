@@ -20,7 +20,7 @@ class FileUncompressor
             $out_file = fopen($outputPath, 'wb');
             $file = gzopen($compressedFiledPath, 'rb');
 
-            if ($out_file === false || $file === false) {
+            if (false === $out_file || false === $file) {
                 throw new \RuntimeException('An error occurred when opening stream for compressed file or destination file');
             }
 

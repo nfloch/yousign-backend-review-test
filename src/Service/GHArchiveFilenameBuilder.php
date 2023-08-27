@@ -6,6 +6,6 @@ class GHArchiveFilenameBuilder
 {
     public function buildFilename(string $date, string $hour): string
     {
-        return "$date-$hour.json";
+        return "{$date}-{$hour}.json";
     }
 }

@@ -13,9 +13,10 @@ class GHArchiveEventDenormalizer implements DenormalizerInterface
     public function denormalize(mixed $data, string $type, string $format = null, array $context = []): GHArchiveEntry
     {
         $createdAt = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s\Z', $data['created_at']);
-        if ($createdAt === false) {
+        if (false === $createdAt) {
             throw new \RuntimeException('Unable to convert date string to DateTimeInterface object');
         }
+
         return new GHArchiveEntry(
             $data['id'],
             $data['type'],

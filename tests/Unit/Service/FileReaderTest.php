@@ -5,6 +5,11 @@ namespace App\Tests\Unit\Service;
 use App\Service\FileReader;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
 class FileReaderTest extends TestCase
 {
     private FileReader $testedInstance;

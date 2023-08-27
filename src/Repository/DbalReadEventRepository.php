@@ -8,11 +8,8 @@ use Doctrine\DBAL\Exception;
 
 class DbalReadEventRepository implements ReadEventRepository
 {
-    private Connection $connection;
-
-    public function __construct(Connection $connection)
+    public function __construct(private readonly Connection $connection)
     {
-        $this->connection = $connection;
     }
 
     public function countAll(SearchInput $searchInput): int
@@ -31,6 +28,7 @@ SQL;
 
     /**
      * @return array<string, int>
+     *
      * @throws Exception
      */
     public function countByType(SearchInput $searchInput): array
@@ -76,6 +74,7 @@ SQL;
 
     /**
      * @return array<array<string, mixed>>
+     *
      * @throws Exception
      */
     public function getLatest(SearchInput $searchInput): array
@@ -92,18 +91,16 @@ SQL;
             'keyword' => $searchInput->keyword,
         ]);
 
-        $result = array_map(static function ($item) {
-            $item['repo'] = json_decode($item['repo'], true);
+        return array_map(static function ($item) {
+            $item['repo'] = json_decode((string) $item['repo'], true, flags: JSON_THROW_ON_ERROR);
 
             return $item;
         }, $result);
-
-        return $result;
     }
 
     public function exist(int $ghaId): bool
     {
-        $sql = <<<SQL
+        $sql = <<<'SQL'
             SELECT 1
             FROM event
             WHERE gha_id = :ghaId

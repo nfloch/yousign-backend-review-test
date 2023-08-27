@@ -25,11 +25,6 @@ class Event
     private int $id;
 
     /**
-     * @ORM\Column(type="bigint")
-     */
-    public int $ghaId;
-
-    /**
      * @ORM\Column(type="EventType", nullable=false)
      */
     private string $type;
@@ -40,46 +35,44 @@ class Event
     private int $count = 1;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Actor", cascade={"persist"})
-     * @ORM\JoinColumn(name="actor_id", referencedColumnName="id")
-     */
-    private Actor $actor;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Repo", cascade={"persist"})
-     * @ORM\JoinColumn(name="repo_id", referencedColumnName="id")
-     */
-    private Repo $repo;
-
-    /**
-     * @ORM\Column(type="json", nullable=false, options={"jsonb": true})
-     * @var array<string, mixed>
-     */
-    private array $payload;
-
-    /**
-     * @ORM\Column(type="datetime_immutable", nullable=false)
-     */
-    private \DateTimeImmutable $createAt;
-
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private ?string $comment;
-
-    /**
      * @param array<string, mixed> $payload
      */
-    public function __construct(int $ghaId, string $type, Actor $actor, Repo $repo, array $payload, \DateTimeImmutable $createAt, ?string $comment)
-    {
-        $this->ghaId = $ghaId;
+    public function __construct(
+        /**
+         * @ORM\Column(type="bigint")
+         */
+        public int $ghaId,
+        string $type,
+
+        /**
+         * @ORM\ManyToOne(targetEntity="App\Entity\Actor", cascade={"persist"})
+         * @ORM\JoinColumn(name="actor_id", referencedColumnName="id")
+         */
+        private Actor $actor,
+
+        /**
+         * @ORM\ManyToOne(targetEntity="App\Entity\Repo", cascade={"persist"})
+         * @ORM\JoinColumn(name="repo_id", referencedColumnName="id")
+         */
+        private Repo $repo,
+
+        /**
+         * @ORM\Column(type="json", nullable=false, options={"jsonb"=true})
+         */
+        private array $payload,
+
+        /**
+         * @ORM\Column(type="datetime_immutable", nullable=false)
+         */
+        private \DateTimeImmutable $createAt,
+
+        /**
+         * @ORM\Column(type="text", nullable=true)
+         */
+        private ?string $comment,
+    ) {
         EventType::assertValidChoice($type);
         $this->type = $type;
-        $this->actor = $actor;
-        $this->repo = $repo;
-        $this->payload = $payload;
-        $this->createAt = $createAt;
-        $this->comment = $comment;
 
         if (EventType::COMMIT === $type) {
             $this->count = $payload['size'] ?? 1;

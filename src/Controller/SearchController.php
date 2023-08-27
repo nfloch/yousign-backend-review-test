@@ -11,15 +11,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class SearchController
 {
-    private ReadEventRepository $repository;
-    private SerializerInterface $serializer;
-
-    public function __construct(
-        ReadEventRepository $repository,
-        SerializerInterface $serializer
-    ) {
-        $this->repository = $repository;
-        $this->serializer = $serializer;
+    public function __construct(private readonly ReadEventRepository $repository, private readonly SerializerInterface $serializer)
+    {
     }
 
     /**

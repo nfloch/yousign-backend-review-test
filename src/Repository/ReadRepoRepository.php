@@ -22,7 +22,8 @@ class ReadRepoRepository extends ServiceEntityRepository
             ->select('COUNT(r.id)')
             ->where('r.ghaId = :ghaId')
             ->setParameter('ghaId', $ghaId)
-            ->getQuery();
+            ->getQuery()
+        ;
 
         return 1 === (int) $query->getScalarResult();
     }

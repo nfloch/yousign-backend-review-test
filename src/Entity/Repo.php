@@ -24,26 +24,20 @@ class Repo
      */
     private int $id;
 
-    /**
-     * @ORM\Column(type="bigint")
-     */
-    public int $ghaId;
-
-    /**
-     * @ORM\Column(type="string")
-     */
-    public string $name;
-
-    /**
-     * @ORM\Column(type="string")
-     */
-    public string $url;
-
-    public function __construct(int $ghaId, string $name, string $url)
-    {
-        $this->ghaId = $ghaId;
-        $this->name = $name;
-        $this->url = $url;
+    public function __construct(
+        /**
+         * @ORM\Column(type="bigint")
+         */
+        public int $ghaId,
+        /**
+         * @ORM\Column(type="string")
+         */
+        public string $name,
+        /**
+         * @ORM\Column(type="string")
+         */
+        public string $url
+    ) {
     }
 
     public function id(): int

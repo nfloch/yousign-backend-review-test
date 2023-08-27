@@ -24,32 +24,24 @@ class Actor
      */
     public int $id;
 
-    /**
-     * @ORM\Column(type="bigint")
-     */
-    public int $ghaId;
-
-    /**
-     * @ORM\Column(type="string")
-     */
-    public string $login;
-
-    /**
-     * @ORM\Column(type="string")
-     */
-    public string $url;
-
-    /**
-     * @ORM\Column(type="string")
-     */
-    public string $avatarUrl;
-
-    public function __construct(int $ghaId, string $login, string $url, string $avatarUrl)
-    {
-        $this->ghaId = $ghaId;
-        $this->login = $login;
-        $this->url = $url;
-        $this->avatarUrl = $avatarUrl;
+    public function __construct(
+        /**
+         * @ORM\Column(type="bigint")
+         */
+        public int $ghaId,
+        /**
+         * @ORM\Column(type="string")
+         */
+        public string $login,
+        /**
+         * @ORM\Column(type="string")
+         */
+        public string $url,
+        /**
+         * @ORM\Column(type="string")
+         */
+        public string $avatarUrl
+    ) {
     }
 
     public function id(): int
