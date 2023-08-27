@@ -26,3 +26,4 @@ services:
         tags: [ 'controller.service_arguments' ]
 
     App\Entity\EventType: ~
+    App\Service\DataFetcher\GhArchiveDataFetcher: '@App\Service\DataFetcher\GhArchiveFetcherGateway'

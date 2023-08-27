@@ -11,11 +11,9 @@ use App\Entity\Repo;
 use App\Repository\ReadActorRepository;
 use App\Repository\ReadEventRepository;
 use App\Repository\ReadRepoRepository;
+use App\Service\DataFetcher\GhArchiveDataFetcher;
 use App\Service\FileReader;
-use App\Service\FileUncompressor;
-use App\Service\GHArchiveDownloader;
 use App\Service\GHArchiveEventTypeMapper;
-use App\Service\TemporaryFileWriter;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -23,7 +21,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -39,17 +36,14 @@ class ImportGitHubEventsCommand extends Command
     private const BATCH_SIZE = 500;
 
     public function __construct(
-        private readonly GHArchiveDownloader      $archiveDownloader,
-        private readonly TemporaryFileWriter      $fileWriter,
-        private readonly FileUncompressor         $fileUncompressor,
         private readonly FileReader               $fileReader,
         private readonly SerializerInterface      $serializer,
         private readonly ReadEventRepository      $readEventRepository,
         private readonly ReadActorRepository      $actorReadRepository,
         private readonly ReadRepoRepository       $repoReadRepository,
         private readonly EntityManagerInterface   $entityManager,
-        private readonly Filesystem               $filesystem,
-        private readonly GHArchiveEventTypeMapper $eventTypeMapper
+        private readonly GHArchiveEventTypeMapper $eventTypeMapper,
+        private readonly GhArchiveDataFetcher $dataFetcher,
     )
     {
         parent::__construct();
@@ -77,14 +71,14 @@ class ImportGitHubEventsCommand extends Command
         }
 
         $this->io->title("Import GitHub events for date $date and hour $hour");
-        $uncompressedFilePath = $this->fetchDataToFile($date, $hour);
+        $dataFilePath = $this->dataFetcher->fetchData($date, $hour);
         $this->io->info('File downloaded and uncompressed');
 
         $this->io->info('Processing entries');
-        $this->processBatch($uncompressedFilePath);
+        $this->processBatch($dataFilePath);
         $this->io->success('Data successfully processed!');
 
-        $this->filesystem->remove($uncompressedFilePath);
+        // $this->filesystem->remove($dataFilePath);
 
         return Command::SUCCESS;
     }
@@ -93,19 +87,6 @@ class ImportGitHubEventsCommand extends Command
     {
         return DateTimeImmutable::createFromFormat('Y-m-d', $date) !== false &&
             (is_numeric($hour) && intval($hour) >= 1 && intval($hour) <= 23);
-    }
-
-    private function fetchDataToFile(string $date, string $hour): string
-    {
-        $content = $this->archiveDownloader->downloadCompressed("$date-$hour.json.gz");
-        $tempFilePath = $this->fileWriter->writeContentToTempFile($content, "gharchive_", ".json.gz");
-
-        $uncompressedFilePath = str_replace('.gz', '', $tempFilePath);
-        $this->fileUncompressor->uncompressFile($tempFilePath, $uncompressedFilePath);
-
-        $this->filesystem->remove($tempFilePath);
-
-        return $uncompressedFilePath;
     }
 
     private function processBatch(string $uncompressedFilePath): void
